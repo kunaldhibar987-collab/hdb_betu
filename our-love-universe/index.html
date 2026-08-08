@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Our Little Love Universe ❤️</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body class="theme-romance">
+
+  <!-- Background Floating Particles Canvas -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- Audio Toggle -->
+  <div id="musicContainer" class="music-float-btn" title="Toggle Music">
+    <button id="musicToggleBtn" aria-label="Toggle Romantic Music">
+      <span class="music-icon">🎵</span>
+      <span class="music-waves"><span></span><span></span><span></span></span>
+    </button>
+  </div>
+  <audio id="bgAudio" loop preload="auto">
+    <source src="assets/music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Aesthetic Header Progress Bar -->
+  <header id="gameProgressHeader" class="progress-header hidden">
+    <div class="progress-info">
+      <span class="brand-heart">💖</span>
+      <span id="stageTitleDisplay">Stage 1</span>
+    </div>
+    <div class="progress-bar-container">
+      <div id="progressBarFill" class="progress-bar-fill"></div>
+    </div>
+    <div class="progress-counter" id="progressCounterDisplay">01 / 25</div>
+  </header>
+
+  <!-- Stage Transition Overlay -->
+  <div id="transitionOverlay" class="transition-overlay hidden">
+    <div class="transition-heart-wipe">💖</div>
+    <div id="transitionMessage" class="transition-text">Preparing next secret...</div>
+  </div>
+
+  <!-- Main Game Stage Viewport -->
+  <main id="stageViewport" class="viewport-container">
+
+    <!-- STAGE 01 — SECRET ENTRY -->
+    <section id="stage-1" class="stage-card glass-card active">
+      <div class="heartbeat-logo">💖</div>
+      <h1 class="gate-title">Aaj mere dil mein entry hai… ❤️</h1>
+      <p class="gate-subtitle">
+        Yeh jagah sabke liye nahi hai…<br />
+        Yahan sirf uss insaan ki entry hai jiske naam se mere face par smile automatically aa jaati hai. 💕
+      </p>
+      <div class="password-box">
+        <div class="input-wrapper">
+          <input type="password" id="passInput" placeholder="Dil ka password daalo..." autocomplete="off" />
+          <button type="button" id="togglePassVisibility" class="btn-icon">👁️</button>
+        </div>
+        <button id="unlockBtn" class="btn-primary btn-pulse"><span>Unlock My Heart</span> ❤️</button>
+      </div>
+      <p id="gateMessage" class="gate-msg-area"></p>
+    </section>
+
+    <!-- STAGE 02 — FIRST LITTLE TASK -->
+    <section id="stage-2" class="stage-card glass-card">
+      <h2>Observation Skill Test 👀</h2>
+      <p class="task-desc">Before you enter deeper… find and click the one heart that is different from the rest!</p>
+      <div id="oddHeartGrid" class="heart-grid"></div>
+      <p id="stage2Feedback" class="feedback-msg"></p>
+    </section>
+
+    <!-- STAGE 03 — CHOOSE A DOOR -->
+    <section id="stage-3" class="stage-card glass-card text-center">
+      <h2>Choose Your Path 🚪❤️</h2>
+      <p class="task-desc">Which door draws your heart in right now?</p>
+      <div class="doors-container">
+        <button class="door-btn" onclick="selectDoor('Love')"><span class="door-icon">🚪❤️</span><br/>Love</button>
+        <button class="door-btn" onclick="selectDoor('Madness')"><span class="door-icon">🚪😂</span><br/>Madness</button>
+        <button class="door-btn" onclick="selectDoor('Memories')"><span class="door-icon">🚪🌙</span><br/>Memories</button>
+      </div>
+      <p id="stage3Feedback" class="feedback-msg"></p>
+    </section>
+
+    <!-- STAGE 04 — ONE QUESTION -->
+    <section id="stage-4" class="stage-card glass-card text-center">
+      <h2>Quick Question 💕</h2>
+      <p class="question-title">Who do you think started all this flirting first? 😏</p>
+      <div class="options-vertical">
+        <button class="btn-secondary" onclick="answerQuestion4('Me 😌')">Me 😌</button>
+        <button class="btn-secondary" onclick="answerQuestion4('You 😏')">You 😏</button>
+        <button class="btn-secondary" onclick="answerQuestion4('Both 😂')">Both 😂</button>
+        <button class="btn-secondary" onclick="answerQuestion4('Don\'t know 🤭')">Don't know 🤭</button>
+      </div>
+      <p id="stage4Feedback" class="feedback-msg"></p>
+    </section>
+
+    <!-- STAGE 05 — HEART CATCHER -->
+    <section id="stage-5" class="stage-card glass-card text-center">
+      <h2>Heart Catcher 🧺❤️</h2>
+      <p class="task-desc">Catch 10 falling hearts using your basket (Left/Right keys or drag on mobile)!</p>
+      <div class="game-stats-bar">Score: <strong id="catcherScore">0</strong> / 10</div>
+      <canvas id="catcherCanvas" width="320" height="360"></canvas>
+      <button id="startCatcherBtn" class="btn-primary">Start Game 🎮</button>
+    </section>
+
+    <!-- STAGE 06 — DON'T PRESS -->
+    <section id="stage-6" class="stage-card glass-card text-center">
+      <h2>⚠️ Strict Warning</h2>
+      <p class="task-desc">Whatever you do… DO NOT press this button below.</p>
+      <div class="margin-top-lg">
+        <button id="dontPressBtn" class="btn-danger btn-pulse">DON'T PRESS THIS BUTTON 🚫</button>
+      </div>
+      <p id="dontPressMsg" class="feedback-msg margin-top"></p>
+    </section>
+
+    <!-- STAGE 07 — SHAYARI MACHINE -->
+    <section id="stage-7" class="stage-card glass-card text-center">
+      <h2>Dil Ki Baatein 📜🌙</h2>
+      <div class="shayari-box glass-subcard">
+        <p id="stage7ShayariText" class="shayari-text">Loading lines...</p>
+      </div>
+      <p class="task-desc">Click "One More" <strong id="shayariClicksLeft">3</strong> more times to unlock the next screen!</p>
+      <button id="oneMoreShayariBtn" class="btn-glow margin-top">One More ❤️</button>
+    </section>
+
+    <!-- STAGE 08 — EYES SPECIAL -->
+    <section id="stage-8" class="stage-card glass-card text-center">
+      <h2>Okay… We Need To Talk About Those Eyes 👀❤️</h2>
+      <div class="eyes-photo-frame">
+        <img src="assets/images/her-eyes.jpg" onerror="this.src='https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600'" alt="Her Eyes" />
+      </div>
+      <p class="task-desc">Tap all 3 secret appreciation cards below!</p>
+      <div class="eye-cards-grid" id="eyeCardsGrid">
+        <button class="eye-card-btn" onclick="revealEyeCard(this, 'They hold a whole universe of warmth.')">Card 1 ✨</button>
+        <button class="eye-card-btn" onclick="revealEyeCard(this, 'Looking into them fixes my worst days.')">Card 2 💕</button>
+        <button class="eye-card-btn" onclick="revealEyeCard(this, 'Literally my absolute favourite distraction.')">Card 3 😭</button>
+      </div>
+      <p id="stage8Feedback" class="feedback-msg margin-top"></p>
+    </section>
+
+    <!-- STAGE 09 — MEMORY MATCH -->
+    <section id="stage-9" class="stage-card glass-card text-center">
+      <h2>Matching Pairs 🃏❤️</h2>
+      <p class="task-desc">Match all 4 pairs to proceed!</p>
+      <div id="memoryGrid" class="memory-grid"></div>
+    </section>
+
+    <!-- STAGE 10 — WHO KNOWS WHOM BETTER -->
+    <section id="stage-10" class="stage-card glass-card text-center">
+      <h2>How Well Do You Know Us? 🧠💕</h2>
+      <div id="quizContainer">
+        <p id="quizQuestionText" class="question-title">Loading question...</p>
+        <div id="quizOptionsGrid" class="options-vertical margin-top"></div>
+      </div>
+    </section>
+
+    <!-- STAGE 11 — FLIRTING METER -->
+    <section id="stage-11" class="stage-card glass-card text-center">
+      <h2>Rate My Flirting Skills 😉❤️</h2>
+      <p class="task-desc">Move the slider and submit your honest score!</p>
+      <div class="slider-wrapper margin-top">
+        <input type="range" id="flirtSlider" min="0" max="100" value="50" class="slider" />
+        <div class="slider-val"><span id="flirtScoreDisplay">50</span> / 100</div>
+      </div>
+      <p id="flirtFeedback" class="feedback-msg">Okay, we're getting somewhere.</p>
+      <button id="submitFlirtScoreBtn" class="btn-primary margin-top">Lock My Rating 🔐</button>
+    </section>
+
+    <!-- STAGE 12 — COMPLETE THE SENTENCE -->
+    <section id="stage-12" class="stage-card glass-card text-center">
+      <h2>Complete The Sentence 💌</h2>
+      <p class="question-title">"You are my favourite person because ______."</p>
+      <div class="margin-top">
+        <input type="text" id="sentenceInput" class="input-field" placeholder="Type your answer here..." autocomplete="off" />
+      </div>
+      <button id="saveSentenceBtn" class="btn-primary margin-top">Save In Memory Box ❤️</button>
+      <p id="stage12Feedback" class="feedback-msg margin-top"></p>
+    </section>
+
+    <!-- STAGE 13 — WHO IS MORE LIKELY -->
+    <section id="stage-13" class="stage-card glass-card text-center">
+      <h2>Who Is More Likely To... 😂</h2>
+      <p id="likelyQuestionText" class="question-title">Loading...</p>
+      <div class="button-group flex-center margin-top">
+        <button class="btn-secondary" onclick="answerLikely('ME')">ME 🙋‍♀️</button>
+        <button class="btn-secondary" onclick="answerLikely('YOU')">YOU 🙋‍♂️</button>
+        <button class="btn-secondary" onclick="answerLikely('BOTH')">BOTH 🙈</button>
+      </div>
+      <div class="margin-top small-text">Question <span id="likelyCurrentNum">1</span> of 5</div>
+    </section>
+
+    <!-- STAGE 14 — LOVE JAR -->
+    <section id="stage-14" class="stage-card glass-card text-center">
+      <h2>Digital Love Jar 🫙❤️</h2>
+      <p class="task-desc">Tap the jar to draw <strong id="jarNotesNeeded">3</strong> romantic notes!</p>
+      <div class="jar-icon-wrapper" id="loveJarBtn">
+        <span class="jar-emoji">🫙</span>
+      </div>
+      <p id="jarNoteText" class="feedback-msg margin-top"></p>
+    </section>
+
+    <!-- STAGE 15 — OPEN WHEN LETTERS -->
+    <section id="stage-15" class="stage-card glass-card text-center">
+      <h2>Open When… Letters 💌</h2>
+      <p class="task-desc">Open all 4 envelopes to unlock the transition!</p>
+      <div class="envelopes-grid" id="envelopesGrid"></div>
+      <p id="stage15Feedback" class="feedback-msg margin-top"></p>
+    </section>
+
+    <!-- STAGE 16 — SECRET EASTER EGG -->
+    <section id="stage-16" class="stage-card glass-card text-center relative-stage">
+      <h2>Secret Search 👀✨</h2>
+      <p class="task-desc">There is a tiny secret heart hidden somewhere on this screen. Find and tap it!</p>
+      <p class="small-text margin-top">(Look very closely at the glowing accents...)</p>
+      <button id="hiddenHeartEgg" class="hidden-egg-btn">💖</button>
+    </section>
+
+    <!-- STAGE 17 — MINI SEQUENCE PUZZLE -->
+    <section id="stage-17" class="stage-card glass-card text-center">
+      <h2>Symbol Sequence Puzzle 🧩</h2>
+      <p class="task-desc">Tap the symbols in the correct logical sequence: ❤️ ➔ 🌙 ➔ ⭐ ➔ 🦋 ➔ 🎂</p>
+      <div class="sequence-grid" id="sequenceGrid">
+        <button class="seq-btn" onclick="clickSeqSymbol('⭐')">⭐</button>
+        <button class="seq-btn" onclick="clickSeqSymbol('❤️')">❤️</button>
+        <button class="seq-btn" onclick="clickSeqSymbol('🎂')">🎂</button>
+        <button class="seq-btn" onclick="clickSeqSymbol('🌙')">🌙</button>
+        <button class="seq-btn" onclick="clickSeqSymbol('🦋')">🦋</button>
+      </div>
+      <p id="stage17Feedback" class="feedback-msg margin-top"></p>
+    </section>
+
+    <!-- STAGE 18 — COMPLIMENT MACHINE -->
+    <section id="stage-18" class="stage-card glass-card text-center">
+      <h2>Compliment Generator 💕</h2>
+      <p class="task-desc">Generate <strong id="complimentsNeeded">5</strong> compliments to move forward!</p>
+      <div class="glass-subcard min-height-box">
+        <p id="complimentDisplay" class="lead-text">Click below for your first compliment!</p>
+      </div>
+      <button id="genComplimentBtn" class="btn-glow margin-top">Tell Me Something ❤️</button>
+    </section>
+
+    <!-- STAGE 19 — FAKE LOADING PRANK -->
+    <section id="stage-19" class="stage-card glass-card text-center">
+      <h2>Love Measurement Unit 🧪</h2>
+      <p class="task-desc">Calculating how much I miss you right now...</p>
+      <div class="progress-bar-wrapper margin-top">
+        <div id="fakeProgressFill" class="progress-fill"></div>
+      </div>
+      <p id="fakeCalcStatus" class="lead-text margin-top">0%</p>
+    </section>
+
+    <!-- STAGE 20 — OUR STORY TIMELINE -->
+    <section id="stage-20" class="stage-card glass-card text-center">
+      <h2>Our Memory Journey 📖</h2>
+      <p class="task-desc">Click through our story milestones!</p>
+      <div class="timeline-display glass-subcard margin-top">
+        <h3 id="timelineTitle">Milestone</h3>
+        <p id="timelineDesc" class="margin-top">Description...</p>
+      </div>
+      <button id="nextStoryBtn" class="btn-primary margin-top">Next Memory ➡️</button>
+    </section>
+
+    <!-- STAGE 21 — RANDOM SURPRISE -->
+    <section id="stage-21" class="stage-card glass-card text-center">
+      <h2>Surprise Box 🎁✨</h2>
+      <p class="task-desc">Open <strong id="surprisesNeeded">3</strong> surprise boxes!</p>
+      <div class="glass-subcard min-height-box">
+        <p id="surpriseBoxText" class="lead-text">Ready for a surprise?</p>
+      </div>
+      <button id="triggerSurpriseBtn" class="btn-glow margin-top">✨ SURPRISE ME ✨</button>
+    </section>
+
+    <!-- STAGE 22 — HEART ASSEMBLY PUZZLE -->
+    <section id="stage-22" class="stage-card glass-card text-center">
+      <h2>Assemble My Heart 🧩❤️</h2>
+      <p class="task-desc">Tap all 3 scattered pieces to make the heart whole again!</p>
+      <div class="puzzle-pieces-grid" id="puzzlePiecesGrid">
+        <button class="puzzle-btn" onclick="assemblePiece(this)">🧩 Left Piece</button>
+        <button class="puzzle-btn" onclick="assemblePiece(this)">🧩 Center Piece</button>
+        <button class="puzzle-btn" onclick="assemblePiece(this)">🧩 Right Piece</button>
+      </div>
+      <div id="wholeHeartContainer" class="giant-heart-beat hidden margin-top">💖</div>
+      <p id="stage22Feedback" class="feedback-msg margin-top"></p>
+    </section>
+
+    <!-- STAGE 23 — THE SECRET MESSAGE -->
+    <section id="stage-23" class="stage-card glass-card text-center">
+      <h2>Unscramble The Secret 🔐</h2>
+      <p class="task-desc">Unscramble this sentence to reveal the truth!</p>
+      <div class="scrambled-box glass-subcard margin-top">
+        <p id="scrambledText" class="shayari-text">"uoy erom naht seword nac yas evol I"</p>
+      </div>
+      <button id="revealScrambleBtn" class="btn-primary margin-top">Reveal Cipher Solution 🔑</button>
+      <p id="scrambleSolution" class="feedback-msg margin-top"></p>
+    </section>
+
+    <!-- STAGE 24 — FINAL DOOR -->
+    <section id="stage-24" class="stage-card glass-card text-center">
+      <h2>You've Made It This Far… 🚪❤️</h2>
+      <p class="task-desc">The final chamber of my heart is right behind this door. Are you ready?</p>
+      <div class="button-group flex-center margin-top-lg">
+        <button class="btn-primary btn-glow" onclick="openFinalDoor('ready')">OPEN THE DOOR ❤️</button>
+        <button class="btn-secondary" onclick="openFinalDoor('scared')">I'm Scared 😂</button>
+      </div>
+    </section>
+
+    <!-- STAGE 25 — FINAL HEART EMOTIONAL FINALE -->
+    <section id="stage-25" class="stage-card glass-card text-center">
+      <div class="giant-heart-beat">❤️</div>
+      <div id="finaleTypewriterBody" class="finale-text-body margin-top"></div>
+      <button id="restartJourneyBtn" class="btn-primary btn-glow margin-top hidden">START THE JOURNEY AGAIN ❤️</button>
+    </section>
+
+  </main>
+
+  <!-- Resume Progress Modal -->
+  <div id="resumeModal" class="modal-backdrop hidden">
+    <div class="modal-card glass-card text-center">
+      <h2>Welcome Back! 💕</h2>
+      <p id="resumeModalText" class="margin-top">You were on Stage 1. Would you like to continue your journey?</p>
+      <div class="button-group flex-center margin-top">
+        <button id="resumeYesBtn" class="btn-primary">Continue Journey ❤️</button>
+        <button id="resumeRestartBtn" class="btn-secondary">Start Again 🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load JavaScript Modules -->
+  <script src="js/data.js"></script>
+  <script src="js/games.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
